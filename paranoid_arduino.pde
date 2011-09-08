@@ -4,6 +4,7 @@
 #include <Ethernet.h>
 #include <HTTPClient.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 byte ip[] = { 10, 0, 1, 11 };
@@ -39,20 +40,37 @@ void setup() {
 void loop() {
   // if there are incoming bytes available 
   // from the server, read them and print them:
-  String body = "";
-  
+  String response = "";
+
   if (client.available()) {
     bool more = true;
     while (more) {
       char c = client.read();
       if (c != -1) {
-        body = body + String(c);
+        response = response + String(c);
       } else {
         more = false;
       }
     }
 
-    Serial.print(body);
+    Serial.print(response);
+
+    int start_of_content_length = response.indexOf("Content-Length: ");
+    int end_of_content_length = response.indexOf("\n", start_of_content_length + 17);
+    String content_length = response.substring(start_of_content_length + 16, end_of_content_length);
+
+    char buf[10];
+    content_length.toCharArray(buf, 10);
+    int cl_int = atoi ( buf );
+    int body_start = response.length() - cl_int;
+
+    Serial.print("CL:");
+    Serial.println(cl_int);
+
+    String body = response.substring(body_start, response.length());
+    Serial.println(body.length());
+    Serial.println("BODY:");
+    Serial.println(body);
   }
 
   delay(5000);

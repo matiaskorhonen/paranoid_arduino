@@ -1,4 +1,8 @@
-/* Paranoid Arduino Client */
+/*
+  Paranoid Arduino Client
+
+  MIT licensed. Copyright 2011 Matias Korhonen.
+*/
 
 #include <SPI.h>
 #include <Ethernet.h>
@@ -11,8 +15,6 @@ byte ip[] = { 10, 0, 1, 11 };
 byte server[] = { 109, 74, 197, 203 };
 
 // Initialize the Ethernet client library
-// with the IP address and port of the server 
-// that you want to connect to (port 80 is default for HTTP):
 Client client(server, 80);
 
 void setup() {

@@ -22,18 +22,7 @@ void setup() {
   Ethernet.begin(mac, ip);
   delay(1000);
 
-  // If you get a connection, report back via serial:
-  if (client.connect()) {
-    Serial.println("Connected.");
-    client.println("GET /latest.txt HTTP/1.1");
-    client.println("Host: paranoid_proxy.matiaskorhonen.fi");
-    client.println("User-Agent: ParanoidArduino");
-    client.println();
-  }
-  else {
-    // If you didn't get a connection to the server:
-    Serial.println("Connection failed.");
-  }
+  connect();
 }
 
 void loop() {
@@ -70,11 +59,24 @@ void loop() {
   // If the server's disconnected, stop the client:
   if (!client.connected()) {
     Serial.println();
-    Serial.println("Disconnecting.");
-    client.stop();
+    Serial.println("Disconnected. Reconnecting.");
+    connect();
+  }
+}
 
-  // Do nothing forevermore:
-  for(;;)
-    ;
+void connect() {
+  // If you get a connection, report back via serial:
+  if (client.connect()) {
+    Serial.println("Connected.");
+    client.println("GET /latest.txt HTTP/1.1");
+    client.println("Host: paranoid_proxy.matiaskorhonen.fi");
+    client.println("User-Agent: ParanoidArduino");
+    client.println();
+  }
+  else {
+    // If you didn't get a connection to the server:
+    Serial.println("Connection failed. Retrying in 5000 milliseconds.");
+    delay(5000);
+    connect();
   }
 }

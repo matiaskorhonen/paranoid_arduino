@@ -9,6 +9,7 @@
 #include <HTTPClient.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <SparkSoftLCD.h>
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 byte ip[] = { 10, 0, 1, 11 };
@@ -17,12 +18,24 @@ byte server[] = { 109, 74, 197, 203 };
 // Initialize the Ethernet client library
 Client client(server, 80);
 
+#define LCD_TX 2
+SparkSoftLCD lcd = SparkSoftLCD(LCD_TX);
+
 void setup() {
+  pinMode(LCD_TX, OUTPUT);
+  lcd.begin(9600);
+  lcd.clear();
+  lcd.cursor(0); // Hide the cursor
+  lcd.scroll(true);
+  lcd.print("Setting up.");
+
   Serial.begin(9600);
   Ethernet.begin(mac, ip);
   delay(1000);
 
   connect();
+  lcd.clear();
+  lcd.print("Done setting up.");
 }
 
 void loop() {
@@ -52,6 +65,11 @@ void loop() {
     String body = response.substring(body_start, response.length());
     Serial.print("Latest Tweet mentioning @paranoid_arduino: ");
     Serial.println(body);
+
+    char tweet[140];
+    body.toCharArray(tweet, 140);
+    lcd.clear();
+    lcd.print(tweet);
   }
 
   delay(5000);
